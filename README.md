@@ -1,4 +1,4 @@
-# Project 3 - *Tweetter*
+# Project 3 - *Tweeter*
 
 **Tweeter** is a basic twitter app to read your tweets.
 
@@ -23,5 +23,5 @@ The following **bonus** features are implemented:
 
 Here's a walkthrough of implemented user stories:
 
-<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='https://media.giphy.com/media/wb3BfujvN9Vfa0ipfi/giphy.gif' title='Video Walkthrough' width='250' alt='Video Walkthrough' />
 
