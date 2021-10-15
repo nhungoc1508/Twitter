@@ -14,6 +14,8 @@ class HomeTableViewController: UITableViewController {
     var numberOfTweets: Int!
     
     let myRefreshControl = UIRefreshControl()
+    
+    var currentUser = NSDictionary()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,13 +23,21 @@ class HomeTableViewController: UITableViewController {
         // ADDITIONAL UI MODIFICATIONS
         tableView.rowHeight = 130
         
-        loadTweets()
+        // loadTweets()
         myRefreshControl.addTarget(self, action: #selector(loadTweets), for: .valueChanged)
         tableView.refreshControl = myRefreshControl
+        self.tableView.rowHeight = UITableView.automaticDimension
+        self.tableView.estimatedRowHeight = 150
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.loadTweets()
+        self.loadUser()
     }
     
     @objc func loadTweets(){
-        numberOfTweets = 20
+        numberOfTweets = 10
         let myUrl = "https://api.twitter.com/1.1/statuses/home_timeline.json"
         let myParams = ["count": numberOfTweets]
         TwitterAPICaller.client?.getDictionariesRequest(url: myUrl, parameters: myParams, success: { (tweets: [NSDictionary]) in
@@ -59,6 +69,14 @@ class HomeTableViewController: UITableViewController {
         })
     }
     
+    func loadUser() {
+        TwitterAPICaller.client?.getCurrentUser(success: { (user: NSDictionary) in
+            self.currentUser = user
+        }, failure: { Error in
+            print(Error)
+        })
+    }
+    
     override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if indexPath.row + 1 == tweetsArray.count {
             loadMoreTweets()
@@ -82,19 +100,20 @@ class HomeTableViewController: UITableViewController {
         let handleLabel = "@" + handle
         cell.handleLabel.text = handleLabel
         
-        let likeCount = tweetsArray[indexPath.row]["favorite_count"] as! Int
-        if likeCount == 0 {
-            cell.likeCount.text = " "
-        } else {
-            cell.likeCount.text = String(likeCount)
-        }
+        let favorited = tweetsArray[indexPath.row]["favorited"] as! Bool
+        cell.setFavorited(favorited)
         
+        let tweetId = tweetsArray[indexPath.row]["id"] as! Int
+        cell.tweetId = tweetId
+        
+        let retweeted = tweetsArray[indexPath.row]["retweeted"] as! Bool
+        cell.setRetweeted(retweeted)
+        
+        let likeCount = tweetsArray[indexPath.row]["favorite_count"] as! Int
+        cell.setLikeCount(likeCount)
+
         let retweetCount = tweetsArray[indexPath.row]["retweet_count"] as! Int
-        if retweetCount == 0 {
-            cell.retweetCount.text = " "
-        } else {
-            cell.retweetCount.text = String(retweetCount)
-        }
+        cell.setRetweetCount(retweetCount)
         
         let imageUrlStr = user["profile_image_url_https"] as! String
         let imageUrlBigger = imageUrlStr.replacingOccurrences(of: "_normal", with: "_bigger")
